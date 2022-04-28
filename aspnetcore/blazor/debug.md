@@ -1,19 +1,21 @@
 ---
 title: Debug ASP.NET Core Blazor WebAssembly
 author: guardrex
-description: Learn how to debug Blazor apps.
+description: Learn how to debug Blazor WebAssembly with browser developer tools and an integrated development environment (IDE).
 monikerRange: '>= aspnetcore-3.1'
 ms.author: riande
 ms.custom: mvc
-ms.date: 08/26/2020
-no-loc: [Home, Privacy, Kestrel, appsettings.json, "ASP.NET Core Identity", cookie, Cookie, Blazor, "Blazor Server", "Blazor WebAssembly", "Identity", "Let's Encrypt", Razor, SignalR]
+ms.date: 11/09/2021
+no-loc: [".NET MAUI", "Mac Catalyst", "Blazor Hybrid", Home, Privacy, Kestrel, appsettings.json, "ASP.NET Core Identity", cookie, Cookie, Blazor, "Blazor Server", "Blazor WebAssembly", "Identity", "Let's Encrypt", Razor, SignalR]
 uid: blazor/debug
 ---
 # Debug ASP.NET Core Blazor WebAssembly
 
-::: moniker range=">= aspnetcore-6.0"
+This article describes how to debug Blazor WebAssembly with browser developer tools and an integrated development environment (IDE).
 
-Blazor WebAssembly apps can be debugged using the browser dev tools in Chromium-based browsers (Edge/Chrome). You can also debug your app using the following integrated development environments (IDEs):
+:::moniker range=">= aspnetcore-6.0"
+
+Blazor WebAssembly apps can be debugged using the browser developer tools in Chromium-based browsers (Edge/Chrome). You can also debug your app using the following IDEs:
 
 * Visual Studio
 * Visual Studio for Mac
@@ -31,9 +33,9 @@ Available scenarios include:
 For now, you *can't*:
 
 * Break on unhandled exceptions.
-* Hit breakpoints during app startup before the debug proxy is running. This includes breakpoints in `Program.Main` (`Program.cs`) and breakpoints in the [`OnInitialized{Async}` lifecycle methods](xref:blazor/components/lifecycle#component-initialization-oninitializedasync) of components that are loaded by the first page requested from the app.
-* Debug in non-local scenarios (for example, [Windows Subsystem for Linux (WSL)](/windows/wsl/) or [Visual Studio Codespaces](/visualstudio/codespaces/overview/what-is-vsonline)).
-* Automatically rebuild the backend `*Server*` app of a hosted Blazor WebAssembly solution during debugging, for example by running the app with [`dotnet watch run`](xref:tutorials/dotnet-watch).
+* Hit breakpoints during app startup before the debug proxy is running. This includes breakpoints in `Program.cs` and breakpoints in the [`OnInitialized{Async}` lifecycle methods](xref:blazor/components/lifecycle#component-initialization-oninitializedasync) of components that are loaded by the first page requested from the app.
+* Debug in non-local scenarios (for example, [Windows Subsystem for Linux (WSL)](/windows/wsl/) or [Visual Studio Codespaces](/visualstudio/devinit/devinit-and-codespaces)).
+* Automatically rebuild the backend **`Server`** app of a hosted Blazor WebAssembly solution during debugging, for example by running the app with [`dotnet watch run`](xref:tutorials/dotnet-watch).
 
 ## Prerequisites
 
@@ -76,17 +78,23 @@ The `inspectUri` property:
 * Enables the IDE to detect that the app is a Blazor WebAssembly app.
 * Instructs the script debugging infrastructure to connect to the browser through Blazor's debugging proxy.
 
-The placeholder values for the WebSockets protocol (`wsProtocol`), host (`url.hostname`), port (`url.port`), and inspector URI on the launched browser (`browserInspectUri`) are provided by the framework.
+The placeholder values for the WebSocket protocol (`wsProtocol`), host (`url.hostname`), port (`url.port`), and inspector URI on the launched browser (`browserInspectUri`) are provided by the framework.
 
 # [Visual Studio](#tab/visual-studio)
 
 To debug a Blazor WebAssembly app in Visual Studio:
 
 1. Create a new hosted Blazor WebAssembly solution.
-1. Press <kbd>F5</kbd> to run the app in the debugger.
+1. With the **`Server`** project selected in **Solution Explorer**, press <kbd>F5</kbd> to run the app in the debugger.
 
    > [!NOTE]
-   > **Start Without Debugging** (<kbd>Ctrl</kbd>+<kbd>F5</kbd>) isn't supported. When the app is run in Debug configuration, debugging overhead always results in a small performance reduction.
+   > When debugging with a Chromium-based browser, such as Google Chrome or Microsoft Edge, a new browser window might open with a separate profile for the debugging session instead of opening a tab in an existing browser window with the user's profile. If debugging with the user's profile is a requirement, adopt **one** of the following approaches:
+   >
+   > * Close all open browser instances before pressing <kbd>F5</kbd> to start debugging.
+   > * Configure Visual Studio to launch the browser with the user's profile. For more information on this approach, see [Blazor WASM Debugging in VS launches Edge with a separate user data directory (dotnet/aspnetcore #20915)](https://github.com/dotnet/aspnetcore/issues/20915#issuecomment-614933322).
+
+   > [!NOTE]
+   > **Start Without Debugging** [<kbd>Ctrl</kbd>+<kbd>F5</kbd> (Windows) or <kbd>⌘</kbd>+<kbd>F5</kbd> (macOS)] isn't supported. When the app is run in Debug configuration, debugging overhead always results in a small performance reduction.
 
 1. In the `*Client*` app, set a breakpoint on the `currentCount++;` line in `Pages/Counter.razor`.
 1. In the browser, navigate to `Counter` page and select the **Click me** button to hit the breakpoint.
@@ -102,7 +110,7 @@ While debugging a Blazor WebAssembly app, you can also debug server code:
 1. Press <kbd>F5</kbd> again to let execution continue and see the weather forecast table rendered in the browser.
 
 > [!NOTE]
-> Breakpoints are **not** hit during app startup before the debug proxy is running. This includes breakpoints in `Program.Main` (`Program.cs`) and breakpoints in the [`OnInitialized{Async}` lifecycle methods](xref:blazor/components/lifecycle#component-initialization-oninitializedasync) of components that are loaded by the first page requested from the app.
+> Breakpoints are **not** hit during app startup before the debug proxy is running. This includes breakpoints in `Program.cs` and breakpoints in the [`OnInitialized{Async}` lifecycle methods](xref:blazor/components/lifecycle#component-initialization-oninitializedasync) of components that are loaded by the first page requested from the app.
 
 If the app is hosted at a different [app base path](xref:blazor/host-and-deploy/index#app-base-path) than `/`, update the following properties in `Properties/launchSettings.json` to reflect the app's base path:
 
@@ -166,15 +174,23 @@ For information on configuring VS Code assets in the `.vscode` folder, see the *
 
    * Confirm that the latest [C# for Visual Studio Code Extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp) is installed. To inspect the installed extensions, open **View** > **Extensions** from the menu bar or select the **Extensions** icon in the **Activity** sidebar.
    * When using the [C# for Visual Studio Code Extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp) **version 1.23.9 or later**, confirm that the latest [Blazor WASM Debugging Extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.blazorwasm-companion) is installed. To inspect the installed extensions, open **View** > **Extensions** from the menu bar or select the **Extensions** icon in the **Activity** sidebar.
-   * Confirm that JavaScript preview debugging is enabled. Open the settings from the menu bar (**File** > **Preferences** > **Settings**). Search using the keywords `debug preview`. In the search results, set or confirm that the checkbox for **Debug > JavaScript: Use Preview** is checked. If the option to enable preview debugging isn't present, either upgrade to the latest version of VS Code or install the [JavaScript Debugger Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.js-debug-nightly) (VS Code versions 1.46 or earlier).
    * Reload the window.
+
+1. Create a `.vscode/launch.json` file with the following configuration. Replace the `{PORT}` placeholder with the port configured in `Properties/launchSettings.json`:
+
+   ```json
+   {
+     "name": "Launch and Debug",
+     "type": "blazorwasm",
+     "request": "launch",
+     "url": "https://localhost:{PORT}"
+   }
+   ```
 
 1. Start debugging using the <kbd>F5</kbd> keyboard shortcut or the menu item.
 
    > [!NOTE]
-   > **Start Without Debugging** (<kbd>Ctrl</kbd>+<kbd>F5</kbd>) isn't supported. When the app is run in Debug configuration, debugging overhead always results in a small performance reduction.
-
-1. When prompted, select the **Blazor WebAssembly Debug** option to start debugging.
+   > **Start Without Debugging** [<kbd>Ctrl</kbd>+<kbd>F5</kbd> (Windows) or <kbd>⌘</kbd>+<kbd>F5</kbd> (macOS)] isn't supported. When the app is run in Debug configuration, debugging overhead always results in a small performance reduction.
 
 1. The standalone app is launched, and a debugging browser is opened.
 
@@ -183,74 +199,39 @@ For information on configuring VS Code assets in the `.vscode` folder, see the *
 1. In the browser, navigate to `Counter` page and select the **Click me** button to hit the breakpoint.
 
 > [!NOTE]
-> Breakpoints are **not** hit during app startup before the debug proxy is running. This includes breakpoints in `Program.Main` (`Program.cs`) and breakpoints in the [`OnInitialized{Async}` lifecycle methods](xref:blazor/components/lifecycle#component-initialization-oninitializedasync) of components that are loaded by the first page requested from the app.
+> Breakpoints are **not** hit during app startup before the debug proxy is running. This includes breakpoints in `Program.cs` and breakpoints in the [`OnInitialized{Async}` lifecycle methods](xref:blazor/components/lifecycle#component-initialization-oninitializedasync) of components that are loaded by the first page requested from the app.
 
 ## Debug hosted Blazor WebAssembly
 
 For guidance on configuring VS Code assets in the `.vscode` folder and where to place the `.vscode` folder in the solution, see the **Linux** operating system guidance in <xref:blazor/tooling?pivots=linux>.
 
-The `.vscode/launch.json` file sets the current working directory to the `**Server**` project's folder, typically `Server` for a hosted Blazor WebAssembly solution:
+> [!NOTE]
+> Only [browser debugging](#debug-in-the-browser) is supported at this time.
+>
+> You can't automatically rebuild the backend **`Server`** app of a hosted Blazor WebAssembly solution during debugging, for example by running the app with [`dotnet watch run`](xref:tutorials/dotnet-watch).
 
-```json
-"cwd": "${workspaceFolder}/Server"
+To debug a **published**, hosted Blazor WebAssembly app, configure debugger support (`DebuggerSupport`) and copy output symbols to the `publish` directory (`CopyOutputSymbolsToPublishDirectory`) in the **`Client`** app's project file:
+
+```xml
+<DebuggerSupport>true</DebuggerSupport>
+<CopyOutputSymbolsToPublishDirectory>true</CopyOutputSymbolsToPublishDirectory>
 ```
 
-If Microsoft Edge is used for debugging instead of Google Chrome, the `.vscode/launch.json` launch configuration sets the `browser` property:
+By default, publishing an app disables the preceding properties by setting them to `false`.
 
-```json
-"browser": "edge"
-```
-
-The `.vscode/tasks.json` file adds the **`Server`** app's project file path to the `dotnet build` arguments under `args`. The `**Server**` project's folder is typically named `Server` in a solution based on the hosted Blazor WebAssembly project template. The following example uses the project file for the **`Server`** app of the [Blazor-SignalR tutorial](xref:tutorials/signalr-blazor)), which has a project file named `BlazorWebAssemblySignalRApp.Server.csproj`:
-
-```json
-{
-    ...
-    "tasks": [
-        {
-            "label": "build",
-            "command": "dotnet",
-            "type": "shell",
-            "args": [
-                ...
-                "${workspaceFolder}/Server/BlazorWebAssemblySignalRApp.Server.csproj",
-                ...
-            ],
-            ...
-        }
-    ]
-}
-```
-
-The **`Server`** project's `Properties/launchSettings.json` file includes the `inspectUri` property for the debugging proxy. The following example names the launch profile for the **`Server`** app of the [Blazor-SignalR tutorial](xref:tutorials/signalr-blazor)), which is `BlazorWebAssemblySignalRApp.Server`:
-
-```json
-{
-  "iisSettings": {
-    ...
-  },
-  "profiles": {
-    "IIS Express": {
-      "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
-      ...
-    },
-    "BlazorWebAssemblySignalRApp.Server": {
-      "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
-      ...
-    }
-  }
-}
-```
+> [!WARNING]
+> Published, hosted Blazor WebAssembly apps should only enable debugging and copying output symbols when deploying published assets ***locally***. Do **not*** deploy a published app into production with the `DebuggerSupport` and `CopyOutputSymbolsToPublishDirectory` properties set to `true`.
 
 ## Attach to an existing debugging session
 
-To attach to a running Blazor app, create a `launch.json` file with the following configuration:
+To attach to a running Blazor app, create a `.vscode/launch.json` file with the following configuration. Replace the `{URL}` placeholder with the URL where the app is running:
 
 ```json
 {
+  "name": "Attach and Debug"
   "type": "blazorwasm",
   "request": "attach",
-  "name": "Attach to Existing Blazor WebAssembly Application"
+  "url": "{URL}"
 }
 ```
 
@@ -264,7 +245,7 @@ The following launch configuration options are supported for the `blazorwasm` de
 | Option    | Description |
 | --------- | ----------- |
 | `request` | Use `launch` to launch and attach a debugging session to a Blazor WebAssembly app or `attach` to attach a debugging session to an already-running app. |
-| `url`     | The URL to open in the browser when debugging. Defaults to `https://localhost:5001`. |
+| `url`     | The URL to open in the browser when debugging. Defaults to `https://localhost:5001`. If the app is running at a different URL, an `about:blank` tab launches in the browser. |
 | `browser` | The browser to launch for the debugging session. Set to `edge` or `chrome`. Defaults to `chrome`. |
 | `trace`   | Used to generate logs from the JS debugger. Set to `true` to generate logs. |
 | `hosted`  | Must be set to `true` if launching and debugging a hosted Blazor WebAssembly app. |
@@ -274,34 +255,11 @@ The following launch configuration options are supported for the `blazorwasm` de
 | `cwd`     | The working directory to launch the app under. Must be set if `hosted` is `true`. |
 | `env`     | The environment variables to provide to the launched process. Only applicable if `hosted` is set to `true`. |
 
-## Example launch configurations
-
-### Launch and debug a standalone Blazor WebAssembly app
-
-```json
-{
-  "type": "blazorwasm",
-  "request": "launch",
-  "name": "Launch and Debug"
-}
-```
-
-### Attach to a running app at a specified URL
-
-```json
-{
-  "type": "blazorwasm",
-  "request": "attach",
-  "name": "Attach and Debug",
-  "url": "http://localhost:5000"
-}
-```
-
 # [Visual Studio for Mac](#tab/visual-studio-mac)
 
 To debug a Blazor WebAssembly app in Visual Studio for Mac:
 
-1. Create a new ASP.NET Core hosted Blazor WebAssembly app.
+1. Create a new hosted Blazor WebAssembly app.
 1. Press <kbd>&#8984;</kbd>+<kbd>&#8617;</kbd> to run the app in the debugger.
 
    > [!NOTE]
@@ -324,7 +282,7 @@ While debugging a Blazor WebAssembly app, you can also debug server code:
 1. Press <kbd>&#8984;</kbd>+<kbd>&#8617;</kbd> again to let execution continue and see the weather forecast table rendered in the browser.
 
 > [!NOTE]
-> Breakpoints are **not** hit during app startup before the debug proxy is running. This includes breakpoints in `Program.Main` (`Program.cs`) and breakpoints in the [`OnInitialized{Async}` lifecycle methods](xref:blazor/components/lifecycle#component-initialization-oninitializedasync) of components that are loaded by the first page requested from the app.
+> Breakpoints are **not** hit during app startup before the debug proxy is running. This includes breakpoints in `Program.cs` and breakpoints in the [`OnInitialized{Async}` lifecycle methods](xref:blazor/components/lifecycle#component-initialization-oninitializedasync) of components that are loaded by the first page requested from the app.
 
 For more information, see [Debugging with Visual Studio for Mac](/visualstudio/mac/debugging).
 
@@ -336,7 +294,7 @@ For more information, see [Debugging with Visual Studio for Mac](/visualstudio/m
 
 1. Run a Debug build of the app in the Development environment.
 
-1. Launch a browser and navigate to the app's URL (for example, `https://localhost:5001`).
+1. Launch a browser and navigate to the app's URL (for example, `https://localhost:7268`).
 
 1. In the browser, attempt to commence remote debugging by pressing <kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>d</kbd>.
 
@@ -368,7 +326,7 @@ Browser source maps allow the browser to map compiled files back to their origin
 If a firewall blocks communication with the debug proxy, create a firewall exception rule that permits communication between the browser and the `NodeJS` process.
 
 > [!WARNING]
-> Modification of a firewall configuration must be made with care to avoid creating security vulnerablities. Carefully apply security guidance, follow best security practices, and respect warnings issued by the firewall's manufacturer.
+> Modification of a firewall configuration must be made with care to avoid creating security vulnerabilities. Carefully apply security guidance, follow best security practices, and respect warnings issued by the firewall's manufacturer.
 >
 > Permitting open communication with the `NodeJS` process:
 >
@@ -432,11 +390,11 @@ VsRegEdit.exe set "<VSInstallFolder>" HKCU JSDebugger\Options\Debugging "BlazorT
 
 The `{TIMEOUT}` placeholder in the preceding command is in milliseconds. For example, one minute is assigned as `60000`.
 
-::: moniker-end
+:::moniker-end
 
-::: moniker range=">= aspnetcore-5.0 < aspnetcore-6.0"
+:::moniker range=">= aspnetcore-5.0 < aspnetcore-6.0"
 
-Blazor WebAssembly apps can be debugged using the browser dev tools in Chromium-based browsers (Edge/Chrome). You can also debug your app using the following integrated development environments (IDEs):
+Blazor WebAssembly apps can be debugged using the browser developer tools in Chromium-based browsers (Edge/Chrome). You can also debug your app using the following IDEs:
 
 * Visual Studio
 * Visual Studio for Mac
@@ -454,8 +412,8 @@ Available scenarios include:
 For now, you *can't*:
 
 * Break on unhandled exceptions.
-* Hit breakpoints during app startup before the debug proxy is running. This includes breakpoints in `Program.Main` (`Program.cs`) and breakpoints in the [`OnInitialized{Async}` lifecycle methods](xref:blazor/components/lifecycle#component-initialization-oninitializedasync) of components that are loaded by the first page requested from the app.
-* Debug in non-local scenarios (for example, [Windows Subsystem for Linux (WSL)](/windows/wsl/) or [Visual Studio Codespaces](/visualstudio/codespaces/overview/what-is-vsonline)).
+* Hit breakpoints during app startup before the debug proxy is running. This includes breakpoints in `Program.cs` and breakpoints in the [`OnInitialized{Async}` lifecycle methods](xref:blazor/components/lifecycle#component-initialization-oninitializedasync) of components that are loaded by the first page requested from the app.
+* Debug in non-local scenarios (for example, [Windows Subsystem for Linux (WSL)](/windows/wsl/) or [Visual Studio Codespaces](/visualstudio/devinit/devinit-and-codespaces)).
 * Automatically rebuild the backend `*Server*` app of a hosted Blazor WebAssembly solution during debugging, for example by running the app with [`dotnet watch run`](xref:tutorials/dotnet-watch).
 
 ## Prerequisites
@@ -499,17 +457,23 @@ The `inspectUri` property:
 * Enables the IDE to detect that the app is a Blazor WebAssembly app.
 * Instructs the script debugging infrastructure to connect to the browser through Blazor's debugging proxy.
 
-The placeholder values for the WebSockets protocol (`wsProtocol`), host (`url.hostname`), port (`url.port`), and inspector URI on the launched browser (`browserInspectUri`) are provided by the framework.
+The placeholder values for the WebSocket protocol (`wsProtocol`), host (`url.hostname`), port (`url.port`), and inspector URI on the launched browser (`browserInspectUri`) are provided by the framework.
 
 # [Visual Studio](#tab/visual-studio)
 
 To debug a Blazor WebAssembly app in Visual Studio:
 
 1. Create a new hosted Blazor WebAssembly solution.
-1. Press <kbd>F5</kbd> to run the app in the debugger.
+1. With the **`Server`** project selected in **Solution Explorer**, press <kbd>F5</kbd> to run the app in the debugger.
 
    > [!NOTE]
-   > **Start Without Debugging** (<kbd>Ctrl</kbd>+<kbd>F5</kbd>) isn't supported. When the app is run in Debug configuration, debugging overhead always results in a small performance reduction.
+   > When debugging with a Chromium-based browser, such as Google Chrome or Microsoft Edge, a new browser window might open with a separate profile for the debugging session instead of opening a tab in an existing browser window with the user's profile. If debugging with the user's profile is a requirement, adopt **one** of the following approaches:
+   >
+   > * Close all open browser instances before pressing <kbd>F5</kbd> to start debugging.
+   > * Configure Visual Studio to launch the browser with the user's profile. For more information on this approach, see [Blazor WASM Debugging in VS launches Edge with a separate user data directory (dotnet/aspnetcore #20915)](https://github.com/dotnet/aspnetcore/issues/20915#issuecomment-614933322).
+
+   > [!NOTE]
+   > **Start Without Debugging** [<kbd>Ctrl</kbd>+<kbd>F5</kbd> (Windows) or <kbd>⌘</kbd>+<kbd>F5</kbd> (macOS)] isn't supported. When the app is run in Debug configuration, debugging overhead always results in a small performance reduction.
 
 1. In the `*Client*` app, set a breakpoint on the `currentCount++;` line in `Pages/Counter.razor`.
 1. In the browser, navigate to `Counter` page and select the **Click me** button to hit the breakpoint.
@@ -525,7 +489,7 @@ While debugging a Blazor WebAssembly app, you can also debug server code:
 1. Press <kbd>F5</kbd> again to let execution continue and see the weather forecast table rendered in the browser.
 
 > [!NOTE]
-> Breakpoints are **not** hit during app startup before the debug proxy is running. This includes breakpoints in `Program.Main` (`Program.cs`) and breakpoints in the [`OnInitialized{Async}` lifecycle methods](xref:blazor/components/lifecycle#component-initialization-oninitializedasync) of components that are loaded by the first page requested from the app.
+> Breakpoints are **not** hit during app startup before the debug proxy is running. This includes breakpoints in `Program.cs` and breakpoints in the [`OnInitialized{Async}` lifecycle methods](xref:blazor/components/lifecycle#component-initialization-oninitializedasync) of components that are loaded by the first page requested from the app.
 
 If the app is hosted at a different [app base path](xref:blazor/host-and-deploy/index#app-base-path) than `/`, update the following properties in `Properties/launchSettings.json` to reflect the app's base path:
 
@@ -589,15 +553,23 @@ For information on configuring VS Code assets in the `.vscode` folder, see the *
 
    * Confirm that the latest [C# for Visual Studio Code Extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp) is installed. To inspect the installed extensions, open **View** > **Extensions** from the menu bar or select the **Extensions** icon in the **Activity** sidebar.
    * When using the [C# for Visual Studio Code Extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp) **version 1.23.9 or later**, confirm that the latest [Blazor WASM Debugging Extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.blazorwasm-companion) is installed. To inspect the installed extensions, open **View** > **Extensions** from the menu bar or select the **Extensions** icon in the **Activity** sidebar.
-   * Confirm that JavaScript preview debugging is enabled. Open the settings from the menu bar (**File** > **Preferences** > **Settings**). Search using the keywords `debug preview`. In the search results, set or confirm that the checkbox for **Debug > JavaScript: Use Preview** is checked. If the option to enable preview debugging isn't present, either upgrade to the latest version of VS Code or install the [JavaScript Debugger Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.js-debug-nightly) (VS Code versions 1.46 or earlier).
    * Reload the window.
+
+1. Create a `.vscode/launch.json` file with the following configuration. Replace the `{PORT}` placeholder with the port configured in `Properties/launchSettings.json`:
+
+   ```json
+   {
+     "name": "Launch and Debug",
+     "type": "blazorwasm",
+     "request": "launch",
+     "url": "https://localhost:{PORT}"
+   }
+   ```
 
 1. Start debugging using the <kbd>F5</kbd> keyboard shortcut or the menu item.
 
    > [!NOTE]
-   > **Start Without Debugging** (<kbd>Ctrl</kbd>+<kbd>F5</kbd>) isn't supported. When the app is run in Debug configuration, debugging overhead always results in a small performance reduction.
-
-1. When prompted, select the **Blazor WebAssembly Debug** option to start debugging.
+   > **Start Without Debugging** [<kbd>Ctrl</kbd>+<kbd>F5</kbd> (Windows) or <kbd>⌘</kbd>+<kbd>F5</kbd> (macOS)] isn't supported. When the app is run in Debug configuration, debugging overhead always results in a small performance reduction.
 
 1. The standalone app is launched, and a debugging browser is opened.
 
@@ -606,13 +578,13 @@ For information on configuring VS Code assets in the `.vscode` folder, see the *
 1. In the browser, navigate to `Counter` page and select the **Click me** button to hit the breakpoint.
 
 > [!NOTE]
-> Breakpoints are **not** hit during app startup before the debug proxy is running. This includes breakpoints in `Program.Main` (`Program.cs`) and breakpoints in the [`OnInitialized{Async}` lifecycle methods](xref:blazor/components/lifecycle#component-initialization-oninitializedasync) of components that are loaded by the first page requested from the app.
+> Breakpoints are **not** hit during app startup before the debug proxy is running. This includes breakpoints in `Program.cs` and breakpoints in the [`OnInitialized{Async}` lifecycle methods](xref:blazor/components/lifecycle#component-initialization-oninitializedasync) of components that are loaded by the first page requested from the app.
 
 ## Debug hosted Blazor WebAssembly
 
 For guidance on configuring VS Code assets in the `.vscode` folder and where to place the `.vscode` folder in the solution, see the **Linux** operating system guidance in <xref:blazor/tooling?pivots=linux>.
 
-The `.vscode/launch.json` file sets the current working directory to the `**Server**` project's folder, typically `Server` for a hosted Blazor WebAssembly solution:
+The `.vscode/launch.json` file sets the current working directory to the **`Server`** project's folder, typically `Server` for a hosted Blazor WebAssembly solution:
 
 ```json
 "cwd": "${workspaceFolder}/Server"
@@ -624,7 +596,7 @@ If Microsoft Edge is used for debugging instead of Google Chrome, the `.vscode/l
 "browser": "edge"
 ```
 
-The `.vscode/tasks.json` file adds the **`Server`** app's project file path to the `dotnet build` arguments under `args`. The `**Server**` project's folder is typically named `Server` in a solution based on the hosted Blazor WebAssembly project template. The following example uses the project file for the **`Server`** app of the [Blazor-SignalR tutorial](xref:tutorials/signalr-blazor)), which has a project file named `BlazorWebAssemblySignalRApp.Server.csproj`:
+The `.vscode/tasks.json` file adds the **`Server`** app's project file path to the `dotnet build` arguments under `args`. The **`Server`** project's folder is typically named `Server` in a solution based on the hosted Blazor WebAssembly project template. The following example uses the project file for the **`Server`** app of the [Blazor-SignalR tutorial](xref:blazor/tutorials/signalr-blazor), which has a project file named `BlazorWebAssemblySignalRApp.Server.csproj`:
 
 ```json
 {
@@ -645,7 +617,7 @@ The `.vscode/tasks.json` file adds the **`Server`** app's project file path to t
 }
 ```
 
-The **`Server`** project's `Properties/launchSettings.json` file includes the `inspectUri` property for the debugging proxy. The following example names the launch profile for the **`Server`** app of the [Blazor-SignalR tutorial](xref:tutorials/signalr-blazor)), which is `BlazorWebAssemblySignalRApp.Server`:
+The **`Server`** project's `Properties/launchSettings.json` file includes the `inspectUri` property for the debugging proxy. The following example names the launch profile for the **`Server`** app of the [Blazor-SignalR tutorial](xref:blazor/tutorials/signalr-blazor), which is `BlazorWebAssemblySignalRApp.Server`:
 
 ```json
 {
@@ -665,15 +637,28 @@ The **`Server`** project's `Properties/launchSettings.json` file includes the `i
 }
 ```
 
+To debug a **published**, hosted Blazor WebAssembly app, configure debugger support (`DebuggerSupport`) and copy output symbols to the `publish` directory (`CopyOutputSymbolsToPublishDirectory`) in the **`Client`** app's project file:
+
+```xml
+<DebuggerSupport>true</DebuggerSupport>
+<CopyOutputSymbolsToPublishDirectory>true</CopyOutputSymbolsToPublishDirectory>
+```
+
+By default, publishing an app disables the preceding properties by setting them to `false`.
+
+> [!WARNING]
+> Published, hosted Blazor WebAssembly apps should only enable debugging and copying output symbols when deploying published assets ***locally***. Do **not*** deploy a published app into production with the `DebuggerSupport` and `CopyOutputSymbolsToPublishDirectory` properties set to `true`.
+
 ## Attach to an existing debugging session
 
-To attach to a running Blazor app, create a `launch.json` file with the following configuration:
+To attach to a running Blazor app, create a `.vscode/launch.json` file with the following configuration. Replace the `{URL}` placeholder with the URL where the app is running:
 
 ```json
 {
+  "name": "Attach and Debug"
   "type": "blazorwasm",
   "request": "attach",
-  "name": "Attach to Existing Blazor WebAssembly Application"
+  "url": "{URL}"
 }
 ```
 
@@ -687,7 +672,7 @@ The following launch configuration options are supported for the `blazorwasm` de
 | Option    | Description |
 | --------- | ----------- |
 | `request` | Use `launch` to launch and attach a debugging session to a Blazor WebAssembly app or `attach` to attach a debugging session to an already-running app. |
-| `url`     | The URL to open in the browser when debugging. Defaults to `https://localhost:5001`. |
+| `url`     | The URL to open in the browser when debugging. Defaults to `https://localhost:5001`. If the app is running at a different URL, an `about:blank` tab launches in the browser. |
 | `browser` | The browser to launch for the debugging session. Set to `edge` or `chrome`. Defaults to `chrome`. |
 | `trace`   | Used to generate logs from the JS debugger. Set to `true` to generate logs. |
 | `hosted`  | Must be set to `true` if launching and debugging a hosted Blazor WebAssembly app. |
@@ -697,34 +682,11 @@ The following launch configuration options are supported for the `blazorwasm` de
 | `cwd`     | The working directory to launch the app under. Must be set if `hosted` is `true`. |
 | `env`     | The environment variables to provide to the launched process. Only applicable if `hosted` is set to `true`. |
 
-## Example launch configurations
-
-### Launch and debug a standalone Blazor WebAssembly app
-
-```json
-{
-  "type": "blazorwasm",
-  "request": "launch",
-  "name": "Launch and Debug"
-}
-```
-
-### Attach to a running app at a specified URL
-
-```json
-{
-  "type": "blazorwasm",
-  "request": "attach",
-  "name": "Attach and Debug",
-  "url": "http://localhost:5000"
-}
-```
-
 # [Visual Studio for Mac](#tab/visual-studio-mac)
 
 To debug a Blazor WebAssembly app in Visual Studio for Mac:
 
-1. Create a new ASP.NET Core hosted Blazor WebAssembly app.
+1. Create a new hosted Blazor WebAssembly app.
 1. Press <kbd>&#8984;</kbd>+<kbd>&#8617;</kbd> to run the app in the debugger.
 
    > [!NOTE]
@@ -747,7 +709,7 @@ While debugging a Blazor WebAssembly app, you can also debug server code:
 1. Press <kbd>&#8984;</kbd>+<kbd>&#8617;</kbd> again to let execution continue and see the weather forecast table rendered in the browser.
 
 > [!NOTE]
-> Breakpoints are **not** hit during app startup before the debug proxy is running. This includes breakpoints in `Program.Main` (`Program.cs`) and breakpoints in the [`OnInitialized{Async}` lifecycle methods](xref:blazor/components/lifecycle#component-initialization-oninitializedasync) of components that are loaded by the first page requested from the app.
+> Breakpoints are **not** hit during app startup before the debug proxy is running. This includes breakpoints in `Program.cs` and breakpoints in the [`OnInitialized{Async}` lifecycle methods](xref:blazor/components/lifecycle#component-initialization-oninitializedasync) of components that are loaded by the first page requested from the app.
 
 For more information, see [Debugging with Visual Studio for Mac](/visualstudio/mac/debugging).
 
@@ -791,7 +753,7 @@ Browser source maps allow the browser to map compiled files back to their origin
 If a firewall blocks communication with the debug proxy, create a firewall exception rule that permits communication between the browser and the `NodeJS` process.
 
 > [!WARNING]
-> Modification of a firewall configuration must be made with care to avoid creating security vulnerablities. Carefully apply security guidance, follow best security practices, and respect warnings issued by the firewall's manufacturer.
+> Modification of a firewall configuration must be made with care to avoid creating security vulnerabilities. Carefully apply security guidance, follow best security practices, and respect warnings issued by the firewall's manufacturer.
 >
 > Permitting open communication with the `NodeJS` process:
 >
@@ -855,11 +817,11 @@ VsRegEdit.exe set "<VSInstallFolder>" HKCU JSDebugger\Options\Debugging "BlazorT
 
 The `{TIMEOUT}` placeholder in the preceding command is in milliseconds. For example, one minute is assigned as `60000`.
 
-::: moniker-end
+:::moniker-end
 
-::: moniker range="< aspnetcore-5.0"
+:::moniker range="< aspnetcore-5.0"
 
-Blazor WebAssembly apps can be debugged using the browser dev tools in Chromium-based browsers (Edge/Chrome). You can also debug your app using the following integrated development environments (IDEs):
+Blazor WebAssembly apps can be debugged using the browser developer tools in Chromium-based browsers (Edge/Chrome). You can also debug your app using the following IDEs:
 
 * Visual Studio
 * Visual Studio for Mac
@@ -877,8 +839,8 @@ Available scenarios include:
 For now, you *can't*:
 
 * Break on unhandled exceptions.
-* Hit breakpoints during app startup before the debug proxy is running. This includes breakpoints in `Program.Main` (`Program.cs`) and breakpoints in the [`OnInitialized{Async}` lifecycle methods](xref:blazor/components/lifecycle#component-initialization-oninitializedasync) of components that are loaded by the first page requested from the app.
-* Debug in non-local scenarios (for example, [Windows Subsystem for Linux (WSL)](/windows/wsl/) or [Visual Studio Codespaces](/visualstudio/codespaces/overview/what-is-vsonline)).
+* Hit breakpoints during app startup before the debug proxy is running. This includes breakpoints in `Program.cs` and breakpoints in the [`OnInitialized{Async}` lifecycle methods](xref:blazor/components/lifecycle#component-initialization-oninitializedasync) of components that are loaded by the first page requested from the app.
+* Debug in non-local scenarios (for example, [Windows Subsystem for Linux (WSL)](/windows/wsl/) or [Visual Studio Codespaces](/visualstudio/devinit/devinit-and-codespaces)).
 * Automatically rebuild the backend `*Server*` app of a hosted Blazor WebAssembly solution during debugging, for example by running the app with [`dotnet watch run`](xref:tutorials/dotnet-watch).
 
 ## Prerequisites
@@ -922,17 +884,23 @@ The `inspectUri` property:
 * Enables the IDE to detect that the app is a Blazor WebAssembly app.
 * Instructs the script debugging infrastructure to connect to the browser through Blazor's debugging proxy.
 
-The placeholder values for the WebSockets protocol (`wsProtocol`), host (`url.hostname`), port (`url.port`), and inspector URI on the launched browser (`browserInspectUri`) are provided by the framework.
+The placeholder values for the WebSocket protocol (`wsProtocol`), host (`url.hostname`), port (`url.port`), and inspector URI on the launched browser (`browserInspectUri`) are provided by the framework.
 
 # [Visual Studio](#tab/visual-studio)
 
 To debug a Blazor WebAssembly app in Visual Studio:
 
 1. Create a new hosted Blazor WebAssembly solution.
-1. Press <kbd>F5</kbd> to run the app in the debugger.
+1. With the **`Server`** project selected in **Solution Explorer**, press <kbd>F5</kbd> to run the app in the debugger.
 
    > [!NOTE]
-   > **Start Without Debugging** (<kbd>Ctrl</kbd>+<kbd>F5</kbd>) isn't supported. When the app is run in Debug configuration, debugging overhead always results in a small performance reduction.
+   > When debugging with a Chromium-based browser, such as Google Chrome or Microsoft Edge, a new browser window might open with a separate profile for the debugging session instead of opening a tab in an existing browser window with the user's profile. If debugging with the user's profile is a requirement, adopt **one** of the following approaches:
+   >
+   > * Close all open browser instances before pressing <kbd>F5</kbd> to start debugging.
+   > * Configure Visual Studio to launch the browser with the user's profile. For more information on this approach, see [Blazor WASM Debugging in VS launches Edge with a separate user data directory (dotnet/aspnetcore #20915)](https://github.com/dotnet/aspnetcore/issues/20915#issuecomment-614933322).
+
+   > [!NOTE]
+   > **Start Without Debugging** [<kbd>Ctrl</kbd>+<kbd>F5</kbd> (Windows) or <kbd>⌘</kbd>+<kbd>F5</kbd> (macOS)] isn't supported. When the app is run in Debug configuration, debugging overhead always results in a small performance reduction.
 
 1. In the `*Client*` app, set a breakpoint on the `currentCount++;` line in `Pages/Counter.razor`.
 1. In the browser, navigate to `Counter` page and select the **Click me** button to hit the breakpoint.
@@ -948,7 +916,7 @@ While debugging a Blazor WebAssembly app, you can also debug server code:
 1. Press <kbd>F5</kbd> again to let execution continue and see the weather forecast table rendered in the browser.
 
 > [!NOTE]
-> Breakpoints are **not** hit during app startup before the debug proxy is running. This includes breakpoints in `Program.Main` (`Program.cs`) and breakpoints in the [`OnInitialized{Async}` lifecycle methods](xref:blazor/components/lifecycle#component-initialization-oninitializedasync) of components that are loaded by the first page requested from the app.
+> Breakpoints are **not** hit during app startup before the debug proxy is running. This includes breakpoints in `Program.cs` and breakpoints in the [`OnInitialized{Async}` lifecycle methods](xref:blazor/components/lifecycle#component-initialization-oninitializedasync) of components that are loaded by the first page requested from the app.
 
 If the app is hosted at a different [app base path](xref:blazor/host-and-deploy/index#app-base-path) than `/`, update the following properties in `Properties/launchSettings.json` to reflect the app's base path:
 
@@ -1012,15 +980,23 @@ For information on configuring VS Code assets in the `.vscode` folder, see the *
 
    * Confirm that the latest [C# for Visual Studio Code Extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp) is installed. To inspect the installed extensions, open **View** > **Extensions** from the menu bar or select the **Extensions** icon in the **Activity** sidebar.
    * When using the [C# for Visual Studio Code Extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp) **version 1.23.9 or later**, confirm that the latest [Blazor WASM Debugging Extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.blazorwasm-companion) is installed. To inspect the installed extensions, open **View** > **Extensions** from the menu bar or select the **Extensions** icon in the **Activity** sidebar.
-   * Confirm that JavaScript preview debugging is enabled. Open the settings from the menu bar (**File** > **Preferences** > **Settings**). Search using the keywords `debug preview`. In the search results, set or confirm that the checkbox for **Debug > JavaScript: Use Preview** is checked. If the option to enable preview debugging isn't present, either upgrade to the latest version of VS Code or install the [JavaScript Debugger Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.js-debug-nightly) (VS Code versions 1.46 or earlier).
    * Reload the window.
+
+1. Create a `.vscode/launch.json` file with the following configuration. Replace the `{PORT}` placeholder with the port configured in `Properties/launchSettings.json`:
+
+   ```json
+   {
+     "name": "Launch and Debug",
+     "type": "blazorwasm",
+     "request": "launch",
+     "url": "https://localhost:{PORT}"
+   }
+   ```
 
 1. Start debugging using the <kbd>F5</kbd> keyboard shortcut or the menu item.
 
    > [!NOTE]
-   > **Start Without Debugging** (<kbd>Ctrl</kbd>+<kbd>F5</kbd>) isn't supported. When the app is run in Debug configuration, debugging overhead always results in a small performance reduction.
-
-1. When prompted, select the **Blazor WebAssembly Debug** option to start debugging.
+   > **Start Without Debugging** [<kbd>Ctrl</kbd>+<kbd>F5</kbd> (Windows) or <kbd>⌘</kbd>+<kbd>F5</kbd> (macOS)] isn't supported. When the app is run in Debug configuration, debugging overhead always results in a small performance reduction.
 
 1. The standalone app is launched, and a debugging browser is opened.
 
@@ -1029,13 +1005,13 @@ For information on configuring VS Code assets in the `.vscode` folder, see the *
 1. In the browser, navigate to `Counter` page and select the **Click me** button to hit the breakpoint.
 
 > [!NOTE]
-> Breakpoints are **not** hit during app startup before the debug proxy is running. This includes breakpoints in `Program.Main` (`Program.cs`) and breakpoints in the [`OnInitialized{Async}` lifecycle methods](xref:blazor/components/lifecycle#component-initialization-oninitializedasync) of components that are loaded by the first page requested from the app.
+> Breakpoints are **not** hit during app startup before the debug proxy is running. This includes breakpoints in `Program.cs` and breakpoints in the [`OnInitialized{Async}` lifecycle methods](xref:blazor/components/lifecycle#component-initialization-oninitializedasync) of components that are loaded by the first page requested from the app.
 
 ## Debug hosted Blazor WebAssembly
 
 For guidance on configuring VS Code assets in the `.vscode` folder and where to place the `.vscode` folder in the solution, see the **Linux** operating system guidance in <xref:blazor/tooling?pivots=linux>.
 
-The `.vscode/launch.json` file sets the current working directory to the `**Server**` project's folder, typically `Server` for a hosted Blazor WebAssembly solution:
+The `.vscode/launch.json` file sets the current working directory to the **`Server`** project's folder, typically `Server` for a hosted Blazor WebAssembly solution:
 
 ```json
 "cwd": "${workspaceFolder}/Server"
@@ -1047,7 +1023,7 @@ If Microsoft Edge is used for debugging instead of Google Chrome, the `.vscode/l
 "browser": "edge"
 ```
 
-The `.vscode/tasks.json` file adds the **`Server`** app's project file path to the `dotnet build` arguments under `args`. The `**Server**` project's folder is typically named `Server` in a solution based on the hosted Blazor WebAssembly project template. The following example uses the project file for the **`Server`** app of the [Blazor-SignalR tutorial](xref:tutorials/signalr-blazor)), which has a project file named `BlazorWebAssemblySignalRApp.Server.csproj`:
+The `.vscode/tasks.json` file adds the **`Server`** app's project file path to the `dotnet build` arguments under `args`. The **`Server`** project's folder is typically named `Server` in a solution based on the hosted Blazor WebAssembly project template. The following example uses the project file for the **`Server`** app of the [Blazor-SignalR tutorial](xref:blazor/tutorials/signalr-blazor), which has a project file named `BlazorWebAssemblySignalRApp.Server.csproj`:
 
 ```json
 {
@@ -1068,7 +1044,7 @@ The `.vscode/tasks.json` file adds the **`Server`** app's project file path to t
 }
 ```
 
-The **`Server`** project's `Properties/launchSettings.json` file includes the `inspectUri` property for the debugging proxy. The following example names the launch profile for the **`Server`** app of the [Blazor-SignalR tutorial](xref:tutorials/signalr-blazor)), which is `BlazorWebAssemblySignalRApp.Server`:
+The **`Server`** project's `Properties/launchSettings.json` file includes the `inspectUri` property for the debugging proxy. The following example names the launch profile for the **`Server`** app of the [Blazor-SignalR tutorial](xref:blazor/tutorials/signalr-blazor), which is `BlazorWebAssemblySignalRApp.Server`:
 
 ```json
 {
@@ -1090,13 +1066,14 @@ The **`Server`** project's `Properties/launchSettings.json` file includes the `i
 
 ## Attach to an existing debugging session
 
-To attach to a running Blazor app, create a `launch.json` file with the following configuration:
+To attach to a running Blazor app, create a `.vscode/launch.json` file with the following configuration. Replace the `{URL}` placeholder with the URL where the app is running:
 
 ```json
 {
+  "name": "Attach and Debug"
   "type": "blazorwasm",
   "request": "attach",
-  "name": "Attach to Existing Blazor WebAssembly Application"
+  "url": "{URL}"
 }
 ```
 
@@ -1110,7 +1087,7 @@ The following launch configuration options are supported for the `blazorwasm` de
 | Option    | Description |
 | --------- | ----------- |
 | `request` | Use `launch` to launch and attach a debugging session to a Blazor WebAssembly app or `attach` to attach a debugging session to an already-running app. |
-| `url`     | The URL to open in the browser when debugging. Defaults to `https://localhost:5001`. |
+| `url`     | The URL to open in the browser when debugging. Defaults to `https://localhost:5001`. If the app is running at a different URL, an `about:blank` tab launches in the browser. |
 | `browser` | The browser to launch for the debugging session. Set to `edge` or `chrome`. Defaults to `chrome`. |
 | `trace`   | Used to generate logs from the JS debugger. Set to `true` to generate logs. |
 | `hosted`  | Must be set to `true` if launching and debugging a hosted Blazor WebAssembly app. |
@@ -1120,34 +1097,11 @@ The following launch configuration options are supported for the `blazorwasm` de
 | `cwd`     | The working directory to launch the app under. Must be set if `hosted` is `true`. |
 | `env`     | The environment variables to provide to the launched process. Only applicable if `hosted` is set to `true`. |
 
-## Example launch configurations
-
-### Launch and debug a standalone Blazor WebAssembly app
-
-```json
-{
-  "type": "blazorwasm",
-  "request": "launch",
-  "name": "Launch and Debug"
-}
-```
-
-### Attach to a running app at a specified URL
-
-```json
-{
-  "type": "blazorwasm",
-  "request": "attach",
-  "name": "Attach and Debug",
-  "url": "http://localhost:5000"
-}
-```
-
 # [Visual Studio for Mac](#tab/visual-studio-mac)
 
 To debug a Blazor WebAssembly app in Visual Studio for Mac:
 
-1. Create a new ASP.NET Core hosted Blazor WebAssembly app.
+1. Create a new hosted Blazor WebAssembly app.
 1. Press <kbd>&#8984;</kbd>+<kbd>&#8617;</kbd> to run the app in the debugger.
 
    > [!NOTE]
@@ -1170,7 +1124,7 @@ While debugging a Blazor WebAssembly app, you can also debug server code:
 1. Press <kbd>&#8984;</kbd>+<kbd>&#8617;</kbd> again to let execution continue and see the weather forecast table rendered in the browser.
 
 > [!NOTE]
-> Breakpoints are **not** hit during app startup before the debug proxy is running. This includes breakpoints in `Program.Main` (`Program.cs`) and breakpoints in the [`OnInitialized{Async}` lifecycle methods](xref:blazor/components/lifecycle#component-initialization-oninitializedasync) of components that are loaded by the first page requested from the app.
+> Breakpoints are **not** hit during app startup before the debug proxy is running. This includes breakpoints in `Program.cs` and breakpoints in the [`OnInitialized{Async}` lifecycle methods](xref:blazor/components/lifecycle#component-initialization-oninitializedasync) of components that are loaded by the first page requested from the app.
 
 For more information, see [Debugging with Visual Studio for Mac](/visualstudio/mac/debugging).
 
@@ -1214,7 +1168,7 @@ Browser source maps allow the browser to map compiled files back to their origin
 If a firewall blocks communication with the debug proxy, create a firewall exception rule that permits communication between the browser and the `NodeJS` process.
 
 > [!WARNING]
-> Modification of a firewall configuration must be made with care to avoid creating security vulnerablities. Carefully apply security guidance, follow best security practices, and respect warnings issued by the firewall's manufacturer.
+> Modification of a firewall configuration must be made with care to avoid creating security vulnerabilities. Carefully apply security guidance, follow best security practices, and respect warnings issued by the firewall's manufacturer.
 >
 > Permitting open communication with the `NodeJS` process:
 >
@@ -1278,4 +1232,4 @@ VsRegEdit.exe set "<VSInstallFolder>" HKCU JSDebugger\Options\Debugging "BlazorT
 
 The `{TIMEOUT}` placeholder in the preceding command is in milliseconds. For example, one minute is assigned as `60000`.
 
-::: moniker-end
+:::moniker-end

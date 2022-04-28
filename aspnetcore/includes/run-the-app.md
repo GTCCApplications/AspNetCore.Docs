@@ -1,5 +1,5 @@
 ---
-no-loc: [Home, Privacy, Kestrel, appsettings.json, "ASP.NET Core Identity", cookie, Cookie, Blazor, "Blazor Server", "Blazor WebAssembly", "Identity", "Let's Encrypt", Razor, SignalR]
+no-loc: [".NET MAUI", "Mac Catalyst", "Blazor Hybrid", Home, Privacy, Kestrel, appsettings.json, "ASP.NET Core Identity", cookie, Cookie, Blazor, "Blazor Server", "Blazor WebAssembly", "Identity", "Let's Encrypt", Razor, SignalR]
 ---
 # [Visual Studio](#tab/visual-studio)
 
@@ -19,6 +19,14 @@ no-loc: [Home, Privacy, Kestrel, appsettings.json, "ASP.NET Core Identity", cook
 
   
 # [Visual Studio for Mac](#tab/visual-studio-mac)
+
+* Select **Run** > **Start Without Debugging** to launch the app.
+
+  Visual Studio for Mac:
+
+  * Starts [Kestrel](xref:fundamentals/servers/index#kestrel) server.
+  * Launches a browser.
+  * Navigates to `http://localhost:port`, where *port* is a randomly chosen port number.
 
   [!INCLUDE[](~/includes/trustCertMac.md)]
 

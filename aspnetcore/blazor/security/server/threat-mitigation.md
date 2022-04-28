@@ -5,13 +5,15 @@ description: Learn how to mitigate security threats to Blazor Server apps.
 monikerRange: '>= aspnetcore-3.1'
 ms.author: riande
 ms.custom: mvc
-ms.date: 11/09/2020
-no-loc: [Home, Privacy, Kestrel, appsettings.json, "ASP.NET Core Identity", cookie, Cookie, Blazor, "Blazor Server", "Blazor WebAssembly", "Identity", "Let's Encrypt", Razor, SignalR]
+ms.date: 11/09/2021
+no-loc: [".NET MAUI", "Mac Catalyst", "Blazor Hybrid", Home, Privacy, Kestrel, appsettings.json, "ASP.NET Core Identity", cookie, Cookie, Blazor, "Blazor Server", "Blazor WebAssembly", "Identity", "Let's Encrypt", Razor, SignalR]
 uid: blazor/security/server/threat-mitigation
 ---
 # Threat mitigation guidance for ASP.NET Core Blazor Server
 
-::: moniker range=">= aspnetcore-6.0"
+This article explains how to mitigate security threats to Blazor Server apps.
+
+:::moniker range=">= aspnetcore-6.0"
 
 Blazor Server apps adopt a *stateful* data processing model, where the server and client maintain a long-lived relationship. The persistent state is maintained by a [circuit](xref:blazor/state-management), which can span connections that are also potentially long-lived.
 
@@ -124,7 +126,7 @@ For calls from .NET methods to JavaScript:
 
 Take the following precautions to guard against the preceding scenarios:
 
-* Wrap JS interop calls within [`try-catch`](/dotnet/csharp/language-reference/keywords/try-catch) statements to account for errors that might occur during the invocations. For more information, see <xref:blazor/fundamentals/handle-errors?pivots=server#javascript-interop-server>.
+* Wrap JS interop calls within [`try-catch`](/dotnet/csharp/language-reference/keywords/try-catch) statements to account for errors that might occur during the invocations. For more information, see <xref:blazor/fundamentals/handle-errors#javascript-interop-blazor-server>.
 * Validate data returned from JS interop invocations, including error messages, before taking any action.
 
 ### .NET methods invoked from the browser
@@ -400,9 +402,9 @@ The following list of security considerations isn't comprehensive:
 * Ensure CORS settings are appropriate when enabling CORS or explicitly disable CORS for Blazor apps.
 * Test to ensure that the server-side limits for the Blazor app provide an acceptable user experience without unacceptable levels of risk.
 
-::: moniker-end
+:::moniker-end
 
-::: moniker range=">= aspnetcore-5.0 < aspnetcore-6.0"
+:::moniker range=">= aspnetcore-5.0 < aspnetcore-6.0"
 
 Blazor Server apps adopt a *stateful* data processing model, where the server and client maintain a long-lived relationship. The persistent state is maintained by a [circuit](xref:blazor/state-management), which can span connections that are also potentially long-lived.
 
@@ -475,10 +477,10 @@ By default, there's no limit on the number of connections per user for a Blazor 
     * Require authentication to connect to the app and keep track of the active sessions per user.
     * Reject new sessions upon reaching a limit.
     * Proxy WebSocket connections to an app through the use of a proxy, such as the [Azure SignalR Service](/azure/azure-signalr/signalr-overview) that multiplexes connections from clients to an app. This provides an app with greater connection capacity than a single client can establish, preventing a client from exhausting the connections to the server.
-  * At the server level: Use a proxy/gateway in front of the app. For example, [Azure Front Door](/azure/frontdoor/front-door-overview) enables you to define, manage, and monitor the global routing of web traffic to an app and works when Blazor Server apps are configured to use Long Polling.
+  * At the server level: Use a proxy/gateway in front of the app.
   
     > [!NOTE]
-    > Although Long Polling is supported for Blazor Server apps, [WebSockets is the recommended transport protocol](xref:blazor/host-and-deploy/server#azure-signalr-service). [Azure Front Door](/azure/frontdoor/front-door-overview) doesn't support WebSockets at this time, but support for WebSockets is under consideration for a future release of the service.
+    > Although Long Polling is supported for Blazor Server apps, [WebSockets is the recommended transport protocol](xref:blazor/host-and-deploy/server#azure-signalr-service).
 
 ## Denial of service (DoS) attacks
 
@@ -515,7 +517,7 @@ For calls from .NET methods to JavaScript:
 
 Take the following precautions to guard against the preceding scenarios:
 
-* Wrap JS interop calls within [`try-catch`](/dotnet/csharp/language-reference/keywords/try-catch) statements to account for errors that might occur during the invocations. For more information, see <xref:blazor/fundamentals/handle-errors?pivots=server#javascript-interop-server>.
+* Wrap JS interop calls within [`try-catch`](/dotnet/csharp/language-reference/keywords/try-catch) statements to account for errors that might occur during the invocations. For more information, see <xref:blazor/fundamentals/handle-errors#javascript-interop-blazor-server>.
 * Validate data returned from JS interop invocations, including error messages, before taking any action.
 
 ### .NET methods invoked from the browser
@@ -791,9 +793,9 @@ The following list of security considerations isn't comprehensive:
 * Ensure CORS settings are appropriate when enabling CORS or explicitly disable CORS for Blazor apps.
 * Test to ensure that the server-side limits for the Blazor app provide an acceptable user experience without unacceptable levels of risk.
 
-::: moniker-end
+:::moniker-end
 
-::: moniker range="< aspnetcore-5.0"
+:::moniker range="< aspnetcore-5.0"
 
 Blazor Server apps adopt a *stateful* data processing model, where the server and client maintain a long-lived relationship. The persistent state is maintained by a [circuit](xref:blazor/state-management), which can span connections that are also potentially long-lived.
 
@@ -866,10 +868,10 @@ By default, there's no limit on the number of connections per user for a Blazor 
     * Require authentication to connect to the app and keep track of the active sessions per user.
     * Reject new sessions upon reaching a limit.
     * Proxy WebSocket connections to an app through the use of a proxy, such as the [Azure SignalR Service](/azure/azure-signalr/signalr-overview) that multiplexes connections from clients to an app. This provides an app with greater connection capacity than a single client can establish, preventing a client from exhausting the connections to the server.
-  * At the server level: Use a proxy/gateway in front of the app. For example, [Azure Front Door](/azure/frontdoor/front-door-overview) enables you to define, manage, and monitor the global routing of web traffic to an app and works when Blazor Server apps are configured to use Long Polling.
+  * At the server level: Use a proxy/gateway in front of the app.
   
     > [!NOTE]
-    > Although Long Polling is supported for Blazor Server apps, [WebSockets is the recommended transport protocol](xref:blazor/host-and-deploy/server#azure-signalr-service). [Azure Front Door](/azure/frontdoor/front-door-overview) doesn't support WebSockets at this time, but support for WebSockets is under consideration for a future release of the service.
+    > Although Long Polling is supported for Blazor Server apps, [WebSockets is the recommended transport protocol](xref:blazor/host-and-deploy/server#azure-signalr-service).
 
 ## Denial of service (DoS) attacks
 
@@ -906,7 +908,7 @@ For calls from .NET methods to JavaScript:
 
 Take the following precautions to guard against the preceding scenarios:
 
-* Wrap JS interop calls within [`try-catch`](/dotnet/csharp/language-reference/keywords/try-catch) statements to account for errors that might occur during the invocations. For more information, see <xref:blazor/fundamentals/handle-errors?pivots=server#javascript-interop-server>.
+* Wrap JS interop calls within [`try-catch`](/dotnet/csharp/language-reference/keywords/try-catch) statements to account for errors that might occur during the invocations. For more information, see <xref:blazor/fundamentals/handle-errors#javascript-interop-blazor-server>.
 * Validate data returned from JS interop invocations, including error messages, before taking any action.
 
 ### .NET methods invoked from the browser
@@ -1182,4 +1184,4 @@ The following list of security considerations isn't comprehensive:
 * Ensure CORS settings are appropriate when enabling CORS or explicitly disable CORS for Blazor apps.
 * Test to ensure that the server-side limits for the Blazor app provide an acceptable user experience without unacceptable levels of risk.
 
-::: moniker-end
+:::moniker-end
